@@ -18,7 +18,7 @@ namespace JumboTravel.Api.Controllers
         {
             if (!string.IsNullOrEmpty(message))
             {
-                return Ok(message);
+                return Ok(message + "Prueba");
             } else
             {
                 return NotFound(message);
