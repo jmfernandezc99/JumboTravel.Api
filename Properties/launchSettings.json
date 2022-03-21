@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "JumboTravel.Api": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:54794;http://localhost:54795"
+    }
+  }
+}
