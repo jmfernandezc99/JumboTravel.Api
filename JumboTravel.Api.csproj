@@ -16,6 +16,7 @@
     <Folder Include="src\Data\" />
     <Folder Include="src\Infrastructure\" />
     <Folder Include="src\Application\" />
+    <Folder Include="src\Properties\" />
   </ItemGroup>
 
 </Project>
