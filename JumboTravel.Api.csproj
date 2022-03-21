@@ -7,7 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MySql.Data.EntityFrameworkCore" Version="8.0.22" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="src\Domain\Enums\" />
+    <Folder Include="src\Data\" />
+    <Folder Include="src\Infrastructure\" />
+    <Folder Include="src\Application\" />
   </ItemGroup>
 
 </Project>
