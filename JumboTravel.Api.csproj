@@ -7,16 +7,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MySql.Data.EntityFrameworkCore" Version="8.0.22" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+    <Compile Remove="src\Domain\Enums\**" />
+    <Compile Remove="src\Properties\**" />
+    <Content Remove="src\Domain\Enums\**" />
+    <Content Remove="src\Properties\**" />
+    <EmbeddedResource Remove="src\Domain\Enums\**" />
+    <EmbeddedResource Remove="src\Properties\**" />
+    <None Remove="src\Domain\Enums\**" />
+    <None Remove="src\Properties\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="src\Domain\Enums\" />
-    <Folder Include="src\Data\" />
-    <Folder Include="src\Infrastructure\" />
-    <Folder Include="src\Application\" />
-    <Folder Include="src\Properties\" />
+    <PackageReference Include="MySql.Data" Version="8.0.28" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
   </ItemGroup>
 
 </Project>
