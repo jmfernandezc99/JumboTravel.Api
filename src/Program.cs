@@ -2,7 +2,23 @@ using JumboTravel.Api.src.Application.Data;
 using JumboTravel.Api.src.Application.Services;
 using JumboTravel.Api.src.Domain.Interfaces.Services;
 
+string MyAllowSpecificOrigins = "JumboTravel";
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddHealthChecks();
+
+builder.Services.AddCors(o =>
+{
+    o.AddPolicy(name: MyAllowSpecificOrigins, builder =>
+    {
+        builder.WithOrigins("http://localhost:5500")
+           .AllowAnyHeader()
+           .AllowAnyMethod()
+           .SetIsOriginAllowed((_) => true)
+           .AllowCredentials();
+    });
+});
 
 // Dependency Injection
 builder.Services.AddSingleton<DapperContext>();
@@ -23,6 +39,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors(MyAllowSpecificOrigins);
 
 app.UseAuthorization();
 

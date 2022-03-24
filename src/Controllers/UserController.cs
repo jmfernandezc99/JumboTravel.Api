@@ -20,21 +20,18 @@ namespace JumboTravel.Api.Controllers
 
         [HttpPost("Login")]
         [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> Login([FromBody] LoginRequest rq)
         {
             try
             {
                 var result = await _userService.Login(rq).ConfigureAwait(false);
-                if (result != null)
-                {
-                    return Ok(result);
-                }
-                return Ok("No content.");
+
+                return result != null ? Ok(result) : NoContent();
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                _logger.LogError(ex, "Error in Login, in UserController");
+                _logger.LogError(exception, "Error in Login, in UserController");
                 throw;
             }
         }
