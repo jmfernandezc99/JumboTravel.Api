@@ -1,33 +1,33 @@
-﻿using JumboTravel.Api.src.Domain.Interfaces.Services;
+﻿using Dapper;
+using JumboTravel.Api.src.Application.Data;
+using JumboTravel.Api.src.Domain.Interfaces.Services;
 using JumboTravel.Api.src.Domain.Models.Users;
-using MySql.Data.MySqlClient;
+using JumboTravel.Api.src.Domain.Models.Users.Requests;
+using JumboTravel.Api.src.Domain.Models.Users.Responses;
 
 namespace JumboTravel.Api.src.Application.Services
 {
     public class UserService : IUserService
     {
-        public const string _connectionString = "server=localhost;user=root;database=JUMBOTRAVEL;port=3306;password=root";
-
-        public bool UserExists(GetUserRequest rq)
+        private readonly DapperContext _context;
+        public UserService(DapperContext context)
         {
-            bool result = false;
-            string query = "SELECT dni, pass FROM Personal;";
+            _context = context ?? throw new ArgumentNullException(nameof(context));
+        }
 
-            MySqlConnection connection = new MySqlConnection(_connectionString);
-            connection.Open();
-            MySqlCommand command = new MySqlCommand(query, connection);
-            MySqlDataReader reader = command.ExecuteReader();
-            while (reader.Read())
+        public async Task<LoginResponse?> Login(LoginRequest rq)
+        {
+            var query = $"SELECT * FROM Users WHERE nif = '{rq.UserName}' AND password = '{rq.Password}'";
+            using (var connection = _context.CreateConnection())
             {
-                if (rq.dni == reader.GetString(0) && rq.pass == reader.GetString(1))
+                var response = await connection.QueryAsync<User>(query).ConfigureAwait(false);
+                var user = response.FirstOrDefault();
+
+                return user != null ? new LoginResponse()
                 {
-                    result = true;
-                }
+                    UserId = user.Id
+                } : null;
             }
-            reader.Close();
-            command.Dispose();
-            connection.Close();
-            return result;
         }
     }
 }

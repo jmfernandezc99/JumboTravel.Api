@@ -1,10 +1,12 @@
+using JumboTravel.Api.src.Application.Data;
 using JumboTravel.Api.src.Application.Services;
 using JumboTravel.Api.src.Domain.Interfaces.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Dependency Injection
-builder.Services.AddSingleton<IUserService, UserService>();
+builder.Services.AddSingleton<DapperContext>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 // Add services to the container.
 builder.Services.AddControllers();

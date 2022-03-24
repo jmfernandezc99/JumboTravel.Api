@@ -1,5 +1,6 @@
 ﻿using JumboTravel.Api.src.Domain.Interfaces.Services;
-using JumboTravel.Api.src.Domain.Models.Users;
+using JumboTravel.Api.src.Domain.Models.Users.Requests;
+using JumboTravel.Api.src.Domain.Models.Users.Responses;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JumboTravel.Api.Controllers
@@ -17,17 +18,23 @@ namespace JumboTravel.Api.Controllers
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
 
-        [HttpPost("UserExists")]
-        public bool UserExists([FromBody] GetUserRequest rq)
+        [HttpPost("Login")]
+        [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status204NoContent)]
+        public async Task<IActionResult> Login([FromBody] LoginRequest rq)
         {
             try
             {
-                var result =  _userService.UserExists(rq);
-                return result;
+                var result = await _userService.Login(rq).ConfigureAwait(false);
+                if (result != null)
+                {
+                    return Ok(result);
+                }
+                return Ok("No content.");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error in GetUser, in UserController");
+                _logger.LogError(ex, "Error in Login, in UserController");
                 throw;
             }
         }
