@@ -7,13 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="src\Domain\Enums\**" />
     <Compile Remove="src\Properties\**" />
-    <Content Remove="src\Domain\Enums\**" />
     <Content Remove="src\Properties\**" />
-    <EmbeddedResource Remove="src\Domain\Enums\**" />
     <EmbeddedResource Remove="src\Properties\**" />
-    <None Remove="src\Domain\Enums\**" />
     <None Remove="src\Properties\**" />
   </ItemGroup>
 
