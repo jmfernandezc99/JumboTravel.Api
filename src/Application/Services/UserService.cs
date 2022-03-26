@@ -19,6 +19,10 @@ namespace JumboTravel.Api.src.Application.Services
 
         public async Task<LoginResponse?> Login(LoginRequest rq)
         {
+            // Server=localhost;Database=postgres;User id=postgres;Password=root;Pooling=false;
+
+            // Server=containers-us-west-35.railway.app;Database=railway;User id=postgres;Password=Xwcrvtib7W9KlP88vLiR;Pooling=false;Port=7079;
+
             string query = $"SELECT * FROM Users WHERE nif = '{rq.UserName}' AND password = '{rq.Password}'";
             using (var connection = _context.CreateConnection())
             {
