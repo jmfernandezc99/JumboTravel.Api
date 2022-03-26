@@ -12,7 +12,7 @@ builder.Services.AddCors(o =>
 {
     o.AddPolicy(name: MyAllowSpecificOrigins, builder =>
     {
-        builder.WithOrigins("http://localhost:5500")
+        builder.WithOrigins("http://localhost:5500;https://jumbotravelapi.herokuapp.com")
            .AllowAnyHeader()
            .AllowAnyMethod()
            .SetIsOriginAllowed((_) => true)
