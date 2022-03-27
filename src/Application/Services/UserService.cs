@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using JumboTravel.Api.src.Application.Data;
+using JumboTravel.Api.src.Application.Extensions;
 using JumboTravel.Api.src.Domain.Enums;
 using JumboTravel.Api.src.Domain.Interfaces.Services;
 using JumboTravel.Api.src.Domain.Models.Providers;
@@ -21,7 +22,7 @@ namespace JumboTravel.Api.src.Application.Services
         {
             // Server=localhost;Database=postgres;User id=postgres;Password=root;Pooling=false;
 
-            // Server=containers-us-west-35.railway.app;Database=railway;User id=postgres;Password=Xwcrvtib7W9KlP88vLiR;Pooling=false;Port=7079;
+            // Server=containers-us-west-32.railway.app;Database=railway;User id=postgres;Password=BarLokobyvcPWP5Rveqn;Pooling=false;Port=6921;
 
             string query = $"SELECT * FROM Users WHERE nif = '{rq.UserName}' AND password = '{rq.Password}'";
             using (var connection = _context.CreateConnection())
@@ -38,24 +39,12 @@ namespace JumboTravel.Api.src.Application.Services
 
                     return new LoginResponse()
                     {
-                        UserId = Encrypt(user.Id),
+                        UserId = EncryptExtension.Encrypt(user.Id),
                         Role = userRole
                     };
                 }
                 return null;
             }
-        }
-
-        private string Encrypt(int id)
-        {
-            byte[] encryted = System.Text.Encoding.Unicode.GetBytes(id.ToString());
-            return Convert.ToBase64String(encryted);
-        }
-        private int Decrypt(string id)
-        {
-            byte[] decryted = Convert.FromBase64String(id);
-            string decryptedId = System.Text.Encoding.Unicode.GetString(decryted);
-            return int.TryParse(decryptedId, out int result) ? result : 0;
         }
     }
 }

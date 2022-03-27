@@ -23,6 +23,7 @@ builder.Services.AddCors(o =>
 // Dependency Injection
 builder.Services.AddSingleton<DapperContext>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IPlaneService, PlaneService>();
 
 // Add services to the container.
 builder.Services.AddControllers();
