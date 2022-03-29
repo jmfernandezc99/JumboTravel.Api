@@ -2,11 +2,8 @@
 using JumboTravel.Api.src.Application.Data;
 using JumboTravel.Api.src.Application.Extensions;
 using JumboTravel.Api.src.Domain.Interfaces.Services;
-using JumboTravel.Api.src.Domain.Models.Attendants;
-using JumboTravel.Api.src.Domain.Models.PlaneStocks;
 using JumboTravel.Api.src.Domain.Models.PlaneStocks.Requests;
 using JumboTravel.Api.src.Domain.Models.PlaneStocks.Responses;
-using JumboTravel.Api.src.Domain.Models.Products;
 
 namespace JumboTravel.Api.src.Application.Services
 {
