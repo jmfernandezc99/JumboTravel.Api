@@ -23,35 +23,12 @@ namespace JumboTravel.Api.src.Application.Services
 
             using (var connection = _context.CreateConnection())
             {
-                string queryGetPlane = $"SELECT plane_id as PlaneId FROM attendants WHERE user_id = '{decryptedId}'";
-                var queryGetPlaneResponse = await connection.QueryAsync<Attendant>(queryGetPlane).ConfigureAwait(false);
-                var attendant = queryGetPlaneResponse.FirstOrDefault();
+                string queryGetStock = $"select P.name as ProductName, PS.quantity as Quantity from attendants as A inner join planes as PL " +
+                    $"on A.id = PL.id inner join planestock as PS on PL.id = PS.plane_id inner join products as P " +
+                    $"on PS.product_id = P.id where A.user_id = {decryptedId}";
 
-                string queryGetStock = $"SELECT plane_id as PlaneId, product_id AS ProductId, quantity FROM planestock WHERE plane_id = '{attendant!.PlaneId}'";
-
-                var queryResponse = await connection.QueryAsync<PlaneStock>(queryGetStock).ConfigureAwait(false);
-                var plainStocks = queryResponse.ToList();
-
-                var response = new List<PlaneStockResponse>();
-
-                foreach (var plainStock in plainStocks)
-                {
-                    string queryGetProductNames = $"SELECT name FROM products WHERE id = '{plainStock.ProductId}'";
-
-                    var queryProductResponse = await connection.QueryAsync<Product>(queryGetProductNames).ConfigureAwait(false);
-                    var product = queryProductResponse.FirstOrDefault();
-
-                    if (product != null)
-                    {
-                        response.Add(new PlaneStockResponse()
-                        {
-                            ProductName = product.Name,
-                            Quantity = plainStock.Quantity
-                        });
-                    }
-                }
-
-                return response;
+                var queryGetStockResponse = await connection.QueryAsync<PlaneStockResponse>(queryGetStock).ConfigureAwait(false);
+                return queryGetStockResponse.ToList();
             }
         }
     }
