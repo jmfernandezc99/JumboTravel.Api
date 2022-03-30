@@ -2,6 +2,7 @@
 {
     public class CreateOrderResponse
     {
+        public bool IsCreated { get; set; }
         public int OrderId { get; set; }
     }
 }

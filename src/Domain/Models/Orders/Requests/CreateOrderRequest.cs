@@ -3,6 +3,7 @@
     public class CreateOrderRequest
     {
         public string? UserId { get; set; }
+        public string? Base { get; set; }
         public List<CreateOrderProperties>? Properties { get; set; }
     }
 }

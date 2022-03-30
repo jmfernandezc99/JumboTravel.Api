@@ -1,8 +1,11 @@
-﻿using JumboTravel.Api.src.Application.Data;
+﻿using Dapper;
+using JumboTravel.Api.src.Application.Data;
 using JumboTravel.Api.src.Application.Extensions;
 using JumboTravel.Api.src.Domain.Interfaces.Services;
+using JumboTravel.Api.src.Domain.Models.Orders;
 using JumboTravel.Api.src.Domain.Models.Orders.Requests;
 using JumboTravel.Api.src.Domain.Models.Orders.Responses;
+using JumboTravel.Api.src.Domain.Models.Products;
 
 namespace JumboTravel.Api.src.Application.Services
 {
@@ -14,21 +17,41 @@ namespace JumboTravel.Api.src.Application.Services
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
-        public Task<CreateOrderResponse?> CreateOrder(CreateOrderRequest rq)
+        public async Task<CreateOrderResponse?> CreateOrder(CreateOrderRequest rq)
         {
             int decryptedId = EncryptExtension.Decrypt(rq.UserId!);
 
             using (var connection = _context.CreateConnection())
             {
-                string queryCreateOrder = $"INSERT INTO orders()";
+                DateTime now = DateTime.Now.Date;
+                string date = now.ToString("yyyy-MM-dd");
 
-                /*
-                 INSERT INTO ORDERS (attendant_id , provider_id , date, status)
-                    VALUES
-	                    (1, 1, '2022-03-18', 'progress');
-                 */
+                string queryCreateOrder = $"INSERT INTO orders(attendant_id, base, date, status) " +
+                    $"VALUES ({decryptedId}, '{rq.Base}', '{date}', 'progress')";
 
-                return null;
+                var createOrderResponse = await connection.ExecuteAsync(queryCreateOrder, new Order()).ConfigureAwait(false);
+
+                string queryGetOrder = $"select id from orders where date = '{date}' and attendant_id = {decryptedId}";
+
+                var getOrderQueryResponse = await connection.QueryAsync<Order>(queryGetOrder).ConfigureAwait(false);
+                var order = getOrderQueryResponse.FirstOrDefault();
+
+                string queryCreateOrderLines = $"INSERT INTO ORDERLINES (product_id, order_id , quantity) VALUES ";
+
+                for (int i = 0; i < rq.Properties!.Count; i++)
+                {
+                    string queryProductId = $"SELECT id from products where name = '{rq.Properties[i].ProductName}'";
+                    var getProductIdResponse = await connection.QueryAsync<Product>(queryProductId).ConfigureAwait(false);
+                    var product = getProductIdResponse.FirstOrDefault();
+
+                    queryCreateOrderLines += $"({product!.Id}, {order!.Id}, {rq.Properties[i].Quantity})";
+
+                    queryCreateOrderLines += (i + 1) == rq.Properties.Count ? ";" : ",";
+                }
+
+                var createOrderLines = await connection.ExecuteAsync(queryCreateOrderLines).ConfigureAwait(false);
+
+                return createOrderLines > 0 ? new CreateOrderResponse() { IsCreated = true, OrderId = order!.Id } : null;
             }
         }
     }
