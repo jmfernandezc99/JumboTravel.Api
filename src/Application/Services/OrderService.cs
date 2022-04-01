@@ -36,7 +36,8 @@ namespace JumboTravel.Api.src.Application.Services
                 string queryGetOrder = $"select id from orders where date = '{date}' and attendant_id = {decryptedId}";
 
                 var getOrderQueryResponse = await connection.QueryAsync<Order>(queryGetOrder).ConfigureAwait(false);
-                var order = getOrderQueryResponse.FirstOrDefault();
+
+                var order = getOrderQueryResponse.LastOrDefault();
 
                 string queryCreateOrderLines = $"INSERT INTO ORDERLINES (product_id, order_id , quantity) VALUES ";
 
@@ -66,7 +67,7 @@ namespace JumboTravel.Api.src.Application.Services
                 string getOrdersQuery = $"select id, base, date, status from orders where attendant_id = {decryptedId}";
                 var getOrdersResponse = await connection.QueryAsync<Order>(getOrdersQuery).ConfigureAwait(false);
 
-                return getOrdersResponse.Count() > 1 ? getOrdersResponse.ToList() : new List<Order>();
+                return getOrdersResponse.Count() > 0 ? getOrdersResponse.ToList() : new List<Order>();
             }
         }
 
@@ -77,7 +78,7 @@ namespace JumboTravel.Api.src.Application.Services
                 string getOrdersLinesQuery = $"select P.name as ProductName, OL.quantity from products as P inner join orderlines as OL on P.id = OL.product_id where order_id = {orderId}";
                 var getOrderLinesResponse = await connection.QueryAsync<GetOrderLinesResponse>(getOrdersLinesQuery).ConfigureAwait(false);
 
-                return getOrderLinesResponse.Count() > 1 ? getOrderLinesResponse.ToList() : new List<GetOrderLinesResponse>();
+                return getOrderLinesResponse.Count() > 0 ? getOrderLinesResponse.ToList() : new List<GetOrderLinesResponse>();
             }
         }
     }

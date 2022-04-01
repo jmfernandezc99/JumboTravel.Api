@@ -21,7 +21,7 @@ namespace JumboTravel.Api.src.Application.Services
             using (var connection = _context.CreateConnection())
             {
                 string queryGetStock = $"select P.name as ProductName, PS.quantity as Quantity from attendants as A inner join planes as PL " +
-                    $"on A.id = PL.id inner join planestock as PS on PL.id = PS.plane_id inner join products as P " +
+                    $"on A.plane_id = PL.id inner join planestock as PS on PL.id = PS.plane_id inner join products as P " +
                     $"on PS.product_id = P.id where A.user_id = {decryptedId}";
 
                 var queryGetStockResponse = await connection.QueryAsync<PlaneStockResponse>(queryGetStock).ConfigureAwait(false);
