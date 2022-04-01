@@ -2,6 +2,8 @@
 using JumboTravel.Api.src.Application.Data;
 using JumboTravel.Api.src.Application.Extensions;
 using JumboTravel.Api.src.Domain.Interfaces.Services;
+using JumboTravel.Api.src.Domain.Models.OrderLines;
+using JumboTravel.Api.src.Domain.Models.OrderLines.Responses;
 using JumboTravel.Api.src.Domain.Models.Orders;
 using JumboTravel.Api.src.Domain.Models.Orders.Requests;
 using JumboTravel.Api.src.Domain.Models.Orders.Responses;
@@ -52,6 +54,30 @@ namespace JumboTravel.Api.src.Application.Services
                 var createOrderLines = await connection.ExecuteAsync(queryCreateOrderLines).ConfigureAwait(false);
 
                 return createOrderLines > 0 ? new CreateOrderResponse() { IsCreated = true, OrderId = order!.Id } : null;
+            }
+        }
+
+        public async Task<List<Order>> GetOrders(string userId)
+        {
+            int decryptedId = EncryptExtension.Decrypt(userId);
+
+            using (var connection = _context.CreateConnection())
+            {
+                string getOrdersQuery = $"select id, base, date, status from orders where attendant_id = {decryptedId}";
+                var getOrdersResponse = await connection.QueryAsync<Order>(getOrdersQuery).ConfigureAwait(false);
+
+                return getOrdersResponse.Count() > 1 ? getOrdersResponse.ToList() : new List<Order>();
+            }
+        }
+
+        public async Task<List<GetOrderLinesResponse>> GetOrderLinesByOrderId(string orderId)
+        {
+            using (var connection = _context.CreateConnection())
+            {
+                string getOrdersLinesQuery = $"select P.name as ProductName, OL.quantity from products as P inner join orderlines as OL on P.id = OL.product_id where order_id = {orderId}";
+                var getOrderLinesResponse = await connection.QueryAsync<GetOrderLinesResponse>(getOrdersLinesQuery).ConfigureAwait(false);
+
+                return getOrderLinesResponse.Count() > 1 ? getOrderLinesResponse.ToList() : new List<GetOrderLinesResponse>();
             }
         }
     }

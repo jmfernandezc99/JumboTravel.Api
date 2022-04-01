@@ -24,6 +24,7 @@ namespace JumboTravel.Api.src.Application.Services
             {
                 string query = $"SELECT * FROM Users WHERE nif = '{rq.UserName}' AND password = '{rq.Password}'";
                 Role userRole = Role.Unknown;
+                List<string> origins = new List<string>();
 
                 var response = await connection.QueryAsync<User>(query).ConfigureAwait(false);
                 var user = response.FirstOrDefault();
@@ -33,13 +34,26 @@ namespace JumboTravel.Api.src.Application.Services
                     string queryProvider = $"SELECT * FROM Providers WHERE user_id = '{user.Id}'";
                     var providers = await connection.QueryAsync<Provider>(queryProvider).ConfigureAwait(false);
                     var provider = providers.FirstOrDefault();
-                    userRole = provider != null ? Role.Provider : Role.Attendant;
+                    if (provider != null)
+                    {
+                        userRole = Role.Provider;
+                        origins.Add(provider.Base);
+
+                    } 
+                    else
+                    {
+                        userRole = Role.Attendant;
+                        string getOrigins = $"select R.origin from attendants as A inner join planes as p on A.plane_id = P.id inner join routes as R on R.plane_id = P.id where A.user_id = {user.Id} order by origin desc";
+                        var getOriginsResponse = await connection.QueryAsync<string>(getOrigins).ConfigureAwait(false);
+                        origins = getOriginsResponse.ToList();
+                    }
                 }
 
                 return user != null ? new LoginResponse()
                 {
                     UserId = EncryptExtension.Encrypt(user.Id),
-                    Role = userRole
+                    Role = userRole,
+                    Origins = origins
                 } : null;
             }
         }

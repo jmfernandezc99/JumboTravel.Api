@@ -6,5 +6,6 @@ namespace JumboTravel.Api.src.Domain.Models.Users.Responses
     {
         public string? UserId { get; set; }
         public Role Role { get; set; }
+        public List<string> Origins { get; set; } = new List<string>();
     }
 }

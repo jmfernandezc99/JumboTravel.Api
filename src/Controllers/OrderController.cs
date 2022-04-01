@@ -1,4 +1,6 @@
 ﻿using JumboTravel.Api.src.Domain.Interfaces.Services;
+using JumboTravel.Api.src.Domain.Models.OrderLines;
+using JumboTravel.Api.src.Domain.Models.Orders;
 using JumboTravel.Api.src.Domain.Models.Orders.Requests;
 using JumboTravel.Api.src.Domain.Models.Orders.Responses;
 using Microsoft.AspNetCore.Mvc;
@@ -36,6 +38,52 @@ namespace JumboTravel.Api.src.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in CreateOrder, in OrderController");
+                throw;
+            }
+        }
+
+        [HttpGet("GetOrders")]
+        [ProducesResponseType(typeof(List<Order>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<IActionResult> GetOrders([FromQuery] string userId)
+        {
+            try
+            {
+                var result = await _orderService.GetOrders(userId).ConfigureAwait(false);
+
+                if (result.Count < 1)
+                {
+                    return NoContent();
+                }
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetOrders, in OrderController");
+                throw;
+            }
+        }
+
+        [HttpGet("GetOrderLinesByOrderId")]
+        [ProducesResponseType(typeof(List<OrderLine>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<IActionResult> GetOrderLinesByOrderId([FromQuery] string orderId)
+        {
+            try
+            {
+                var result = await _orderService.GetOrderLinesByOrderId(orderId).ConfigureAwait(false);
+
+                if (result.Count < 1)
+                {
+                    return NoContent();
+                }
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetOrderLinesByOrderId, in OrderController");
                 throw;
             }
         }
