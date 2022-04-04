@@ -19,7 +19,7 @@ namespace JumboTravel.Api.src.Application.Services
             using (var connection = _context.CreateConnection())
             {
                 int decryptedId = EncryptExtension.Decrypt(userId);
-                string queryGetNotifications = $"SELECT id, user_id as UserId, description from notifications where user_id = {decryptedId}";
+                string queryGetNotifications = $"SELECT id, title, user_id as UserId, description from notifications where user_id = {decryptedId}";
 
                 var getNotificationsResponse = await connection.QueryAsync<Notification>(queryGetNotifications).ConfigureAwait(false);
                 return getNotificationsResponse.Count() > 0 ? getNotificationsResponse.ToList() : new List<Notification>();
