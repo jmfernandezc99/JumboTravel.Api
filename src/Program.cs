@@ -25,6 +25,7 @@ builder.Services.AddSingleton<DapperContext>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPlaneService, PlaneService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 
 // Add services to the container.
 builder.Services.AddControllers();
