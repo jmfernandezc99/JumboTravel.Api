@@ -2,7 +2,6 @@
 using JumboTravel.Api.src.Application.Data;
 using JumboTravel.Api.src.Application.Extensions;
 using JumboTravel.Api.src.Domain.Interfaces.Services;
-using JumboTravel.Api.src.Domain.Models.OrderLines;
 using JumboTravel.Api.src.Domain.Models.OrderLines.Responses;
 using JumboTravel.Api.src.Domain.Models.Orders;
 using JumboTravel.Api.src.Domain.Models.Orders.Requests;
@@ -79,6 +78,29 @@ namespace JumboTravel.Api.src.Application.Services
                 var getOrderLinesResponse = await connection.QueryAsync<GetOrderLinesResponse>(getOrdersLinesQuery).ConfigureAwait(false);
 
                 return getOrderLinesResponse.Count() > 0 ? getOrderLinesResponse.ToList() : new List<GetOrderLinesResponse>();
+            }
+        }
+
+        public async Task<bool> CanCreateOrder(string userId)
+        {
+            int decryptedId = EncryptExtension.Decrypt(userId);
+
+            using (var connection = _context.CreateConnection())
+            {
+                string getOrdersQuery = $"select status from orders where attendant_id = {decryptedId}";
+                var getOrdersResponse = await connection.QueryAsync<Order>(getOrdersQuery).ConfigureAwait(false);
+                bool response = true;
+
+                foreach (var order in getOrdersResponse.ToList())
+                {
+                    if (order.Status.Equals("progress"))
+                    {
+                        response = false;
+                        break;
+                    }
+                }
+
+                return response;
             }
         }
     }

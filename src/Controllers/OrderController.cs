@@ -42,6 +42,23 @@ namespace JumboTravel.Api.src.Controllers
             }
         }
 
+        [HttpGet("CanCreateOrder")]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        public async Task<IActionResult> CanCreateOrder([FromQuery] string userId)
+        {
+            try
+            {
+                var result = await _orderService.CanCreateOrder(userId).ConfigureAwait(false);
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetOrders, in OrderController");
+                throw;
+            }
+        }
+
         [HttpGet("GetOrders")]
         [ProducesResponseType(typeof(List<Order>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
