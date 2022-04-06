@@ -42,6 +42,23 @@ namespace JumboTravel.Api.src.Controllers
             }
         }
 
+        [HttpPost("CompleteOrder")]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        public async Task<IActionResult> CompleteOrder([FromBody] CompleteOrderRequest rq)
+        {
+            try
+            {
+                var result = await _orderService.CompleteOrder(rq).ConfigureAwait(false);
+
+                return result ? Ok(result) : BadRequest("Bad request");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in CompleteOrder, in OrderController");
+                throw;
+            }
+        }
+
         [HttpGet("CanCreateOrder")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         public async Task<IActionResult> CanCreateOrder([FromQuery] string userId)
@@ -55,6 +72,29 @@ namespace JumboTravel.Api.src.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in GetOrders, in OrderController");
+                throw;
+            }
+        }
+
+        [HttpGet("GetOrdersByBase")]
+        [ProducesResponseType(typeof(List<Order>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<IActionResult> GetOrdersByBase([FromQuery] string location)
+        {
+            try
+            {
+                var result = await _orderService.GetOrdersByBase(location).ConfigureAwait(false);
+
+                if (result.Count < 1)
+                {
+                    return NoContent();
+                }
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetOrdersByBase, in OrderController");
                 throw;
             }
         }

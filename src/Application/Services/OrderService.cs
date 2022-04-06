@@ -2,11 +2,15 @@
 using JumboTravel.Api.src.Application.Data;
 using JumboTravel.Api.src.Application.Extensions;
 using JumboTravel.Api.src.Domain.Interfaces.Services;
+using JumboTravel.Api.src.Domain.Models.Attendants;
+using JumboTravel.Api.src.Domain.Models.OrderLines;
 using JumboTravel.Api.src.Domain.Models.OrderLines.Responses;
 using JumboTravel.Api.src.Domain.Models.Orders;
 using JumboTravel.Api.src.Domain.Models.Orders.Requests;
 using JumboTravel.Api.src.Domain.Models.Orders.Responses;
+using JumboTravel.Api.src.Domain.Models.PlaneStocks;
 using JumboTravel.Api.src.Domain.Models.Products;
+using JumboTravel.Api.src.Domain.Models.Users;
 
 namespace JumboTravel.Api.src.Application.Services
 {
@@ -99,8 +103,56 @@ namespace JumboTravel.Api.src.Application.Services
                         break;
                     }
                 }
-
                 return response;
+            }
+        }
+
+        public async Task<List<Order>> GetOrdersByBase(string location)
+        {
+            using (var connection = _context.CreateConnection())
+            {
+                string getOrdersQuery = $"select O.id, O.base, O.date, O.status, P.name as plane from orders as O inner join attendants as A ON O.attendant_id = A.id " +
+                    $"inner join Planes as P ON A.plane_id = P.id where O.base = '{location}' and O.status = 'progress'";
+                var getOrdersResponse = await connection.QueryAsync<Order>(getOrdersQuery).ConfigureAwait(false);
+
+                return getOrdersResponse.Count() > 0 ? getOrdersResponse.ToList() : new List<Order>();
+            }
+        }
+
+        public async Task<bool> CompleteOrder(CompleteOrderRequest rq)
+        {
+            using (var connection = _context.CreateConnection())
+            {
+                string getPlaneIdQuery = $"select A.plane_id as PlaneId from attendants as A inner join orders as O on A.id = O.attendant_id where O.id = {rq.OrderId}";
+                var getPlaneIdResponse = await connection.QueryAsync<Attendant>(getPlaneIdQuery).ConfigureAwait(false);
+
+                int planeId = getPlaneIdResponse.ToList()[0].PlaneId;
+
+                string getOrderLinesQuery = $"select id, product_id as ProductId, order_id as OrderId, quantity from orderlines where order_id = {rq.OrderId}";
+                var getOrderLinesResponse = await connection.QueryAsync<OrderLine>(getOrderLinesQuery).ConfigureAwait(false);
+                var orderLines = getOrderLinesResponse.ToList();
+
+                foreach (var item in orderLines)
+                {
+                    string getPlaneStockQuantityQuery = $"select * from planestock where product_id = {item.ProductId} and plane_id = {planeId}";
+                    var getPlaneStockQuantityResponse = await connection.QueryAsync<PlaneStock>(getPlaneStockQuantityQuery).ConfigureAwait(false);
+
+                    int upgradedStock = getPlaneStockQuantityResponse.ToList()[0].Quantity + item.Quantity;
+
+                    string updateQuery = $"UPDATE planestock SET quantity = {upgradedStock} WHERE product_id = {item.ProductId} and plane_id = {planeId}; ";
+
+                    await connection.ExecuteAsync(updateQuery).ConfigureAwait(false);
+                }
+
+                string getAttendantIdQuery = $"select U.id from users as U inner join attendants as A on U.id = A.user_id inner join orders as O on A.id = O.attendant_id where O.id = {rq.OrderId}";
+                var getAttendantIdResponse = await connection.QueryAsync<User>(getAttendantIdQuery).ConfigureAwait(false);
+
+                int attendantId = getAttendantIdResponse.ToList()[0].Id;
+
+                string createNotificationQuery = $"INSERT INTO NOTIFICATIONS (user_id, title, description) VALUES ({attendantId}, 'Recarga avión', 'Su avión ha sido recargado')";
+                var createNotificationResponse = await connection.ExecuteAsync(createNotificationQuery).ConfigureAwait(false);
+
+                return true;
             }
         }
     }

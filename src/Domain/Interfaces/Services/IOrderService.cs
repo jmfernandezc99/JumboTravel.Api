@@ -9,7 +9,9 @@ namespace JumboTravel.Api.src.Domain.Interfaces.Services
     public interface IOrderService
     {
         Task<CreateOrderResponse?> CreateOrder(CreateOrderRequest rq);
+        Task<bool> CompleteOrder(CompleteOrderRequest rq);
         Task<List<Order>> GetOrders(string userId);
+        Task<List<Order>> GetOrdersByBase(string location);
         Task<bool> CanCreateOrder(string userId);
         Task<List<GetOrderLinesResponse>> GetOrderLinesByOrderId(string orderId);
     }
