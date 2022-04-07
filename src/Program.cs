@@ -12,7 +12,7 @@ builder.Services.AddCors(o =>
 {
     o.AddPolicy(name: MyAllowSpecificOrigins, builder =>
     {
-        builder.WithOrigins("http://localhost:5500;https://jumbo-travel-web.vercel.app;http://127.0.0.1:5500")
+        builder.WithOrigins("http://localhost:5500", "https://jumbo-travel-web.vercel.app")
            .AllowAnyHeader()
            .AllowAnyMethod()
            .SetIsOriginAllowed((_) => true)

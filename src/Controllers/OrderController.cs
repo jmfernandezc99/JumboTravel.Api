@@ -3,6 +3,7 @@ using JumboTravel.Api.src.Domain.Models.OrderLines;
 using JumboTravel.Api.src.Domain.Models.Orders;
 using JumboTravel.Api.src.Domain.Models.Orders.Requests;
 using JumboTravel.Api.src.Domain.Models.Orders.Responses;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JumboTravel.Api.src.Controllers
