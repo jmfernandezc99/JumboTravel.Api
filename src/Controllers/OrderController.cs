@@ -76,6 +76,29 @@ namespace JumboTravel.Api.src.Controllers
             }
         }
 
+        [HttpGet("GetAllOrdersByBase")]
+        [ProducesResponseType(typeof(List<Order>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<IActionResult> GetAllOrdersByBase([FromQuery] string location)
+        {
+            try
+            {
+                var result = await _orderService.GetAllOrdersByBase(location).ConfigureAwait(false);
+
+                if (result.Count < 1)
+                {
+                    return NoContent();
+                }
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetAllOrdersByBase, in OrderController");
+                throw;
+            }
+        }
+
         [HttpGet("GetOrdersByBase")]
         [ProducesResponseType(typeof(List<Order>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]

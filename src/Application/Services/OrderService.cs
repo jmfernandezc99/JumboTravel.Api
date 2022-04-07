@@ -150,9 +150,24 @@ namespace JumboTravel.Api.src.Application.Services
                 int attendantId = getAttendantIdResponse.ToList()[0].Id;
 
                 string createNotificationQuery = $"INSERT INTO NOTIFICATIONS (user_id, title, description) VALUES ({attendantId}, 'Recarga avión', 'Su avión ha sido recargado')";
-                var createNotificationResponse = await connection.ExecuteAsync(createNotificationQuery).ConfigureAwait(false);
+                await connection.ExecuteAsync(createNotificationQuery).ConfigureAwait(false);
+
+                string updateOrderToCompleted = $"UPDATE orders SET status = 'completed' where attendant_id = {attendantId} and status = 'progress'";
+                await connection.ExecuteAsync(updateOrderToCompleted).ConfigureAwait(false);
 
                 return true;
+            }
+        }
+
+        public async Task<List<Order>> GetAllOrdersByBase(string location)
+        {
+            using (var connection = _context.CreateConnection())
+            {
+                string getOrdersQuery = $"select O.id, O.base, O.date, O.status, P.name as plane from orders as O inner join attendants as A ON O.attendant_id = A.id " +
+                    $"inner join Planes as P ON A.plane_id = P.id where O.base = '{location}'";
+                var getOrdersResponse = await connection.QueryAsync<Order>(getOrdersQuery).ConfigureAwait(false);
+
+                return getOrdersResponse.Count() > 0 ? getOrdersResponse.ToList() : new List<Order>();
             }
         }
     }

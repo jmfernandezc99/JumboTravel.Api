@@ -12,6 +12,7 @@ namespace JumboTravel.Api.src.Domain.Interfaces.Services
         Task<bool> CompleteOrder(CompleteOrderRequest rq);
         Task<List<Order>> GetOrders(string userId);
         Task<List<Order>> GetOrdersByBase(string location);
+        Task<List<Order>> GetAllOrdersByBase(string location);
         Task<bool> CanCreateOrder(string userId);
         Task<List<GetOrderLinesResponse>> GetOrderLinesByOrderId(string orderId);
     }
