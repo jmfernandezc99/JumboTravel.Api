@@ -12,10 +12,11 @@ builder.Services.AddCors(o =>
 {
     o.AddPolicy(name: MyAllowSpecificOrigins, builder =>
     {
-        builder.AllowAnyOrigin();
-        builder.AllowAnyMethod();
-        builder.AllowAnyHeader();
-        builder.AllowCredentials();
+        builder.WithOrigins("http://localhost:5500", "https://jumbo-travel-web.vercel.app")
+           .AllowAnyMethod()
+           .AllowAnyHeader()
+           .SetIsOriginAllowed((_) => true)
+           .AllowCredentials();
     });
 });
 
