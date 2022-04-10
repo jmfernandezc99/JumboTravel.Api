@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace JumboTravel.Api.src.Domain.Models.PlaneStocks
+﻿namespace JumboTravel.Api.src.Domain.Models.PlaneStocks
 {
     public class PlaneStock
     {

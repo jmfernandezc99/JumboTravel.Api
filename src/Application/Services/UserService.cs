@@ -39,7 +39,7 @@ namespace JumboTravel.Api.src.Application.Services
                         userRole = Role.Provider;
                         origins.Add(provider.Base);
 
-                    } 
+                    }
                     else
                     {
                         userRole = Role.Attendant;

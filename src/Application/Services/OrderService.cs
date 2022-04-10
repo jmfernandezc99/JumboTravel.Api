@@ -170,5 +170,25 @@ namespace JumboTravel.Api.src.Application.Services
                 return getOrdersResponse.Count() > 0 ? getOrdersResponse.ToList() : new List<Order>();
             }
         }
+
+        public async Task<ObtainInvoiceResponse?> ObtainInvoice(int orderId)
+        {
+            using (var connection = _context.CreateConnection())
+            {
+                string getProductsQuery = $"select P.name as ProductName, OL.quantity, P.price from Products as P inner join OrderLines as OL ON P.id = OL.product_id where OL.order_id = {orderId}";
+                var getProductsResponse = await connection.QueryAsync<ObtainInvoicePropertiesResponse>(getProductsQuery).ConfigureAwait(false);
+                var productsDetails = getProductsResponse.ToList();
+
+                decimal totalPrice = 0;
+
+                foreach (var item in productsDetails)
+                {
+                    item.Price = item.Price * item.Quantity;
+                    totalPrice += item.Price;
+                }
+
+                return new ObtainInvoiceResponse() { OrderId = orderId, Properties = productsDetails, TotalPrice = totalPrice };
+            }
+        }
     }
 }

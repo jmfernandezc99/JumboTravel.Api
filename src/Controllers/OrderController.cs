@@ -3,7 +3,6 @@ using JumboTravel.Api.src.Domain.Models.OrderLines;
 using JumboTravel.Api.src.Domain.Models.Orders;
 using JumboTravel.Api.src.Domain.Models.Orders.Requests;
 using JumboTravel.Api.src.Domain.Models.Orders.Responses;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JumboTravel.Api.src.Controllers
@@ -19,6 +18,20 @@ namespace JumboTravel.Api.src.Controllers
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _orderService = orderService ?? throw new ArgumentNullException(nameof(orderService));
+        }
+
+        [HttpGet("ObtainInvoice")]
+        [ProducesResponseType(typeof(ObtainInvoiceResponse), StatusCodes.Status200OK)]
+        public async Task<IActionResult> ObtainInvoice([FromQuery] int orderId)
+        {
+            var result = await _orderService.ObtainInvoice(orderId).ConfigureAwait(false);
+
+            if (result == null)
+            {
+                return BadRequest("Bad Request");
+            }
+
+            return Ok(result);
         }
 
         [HttpPost("CreateOrder")]
