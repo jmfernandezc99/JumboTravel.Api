@@ -8,6 +8,7 @@ using JumboTravel.Api.src.Domain.Models.OrderLines.Responses;
 using JumboTravel.Api.src.Domain.Models.Orders;
 using JumboTravel.Api.src.Domain.Models.Orders.Requests;
 using JumboTravel.Api.src.Domain.Models.Orders.Responses;
+using JumboTravel.Api.src.Domain.Models.Planes;
 using JumboTravel.Api.src.Domain.Models.PlaneStocks;
 using JumboTravel.Api.src.Domain.Models.Products;
 using JumboTravel.Api.src.Domain.Models.Users;
@@ -91,6 +92,16 @@ namespace JumboTravel.Api.src.Application.Services
 
             using (var connection = _context.CreateConnection())
             {
+                string getPlaneStatusQuery = $"select P.status from planes as P inner join attendants as A on P.id = A.plane_id where A.id = {decryptedId}";
+                var getPlaneStatusResponse = await connection.QueryAsync<Plane>(getPlaneStatusQuery).ConfigureAwait(false);
+
+                int planeStatus = getPlaneStatusResponse.ToList()[0].Status;
+
+                if (planeStatus == 1)
+                {
+                    return false;
+                }
+
                 string getOrdersQuery = $"select status from orders where attendant_id = {decryptedId}";
                 var getOrdersResponse = await connection.QueryAsync<Order>(getOrdersQuery).ConfigureAwait(false);
                 bool response = true;
@@ -123,10 +134,15 @@ namespace JumboTravel.Api.src.Application.Services
         {
             using (var connection = _context.CreateConnection())
             {
-                string getPlaneIdQuery = $"select A.plane_id as PlaneId from attendants as A inner join orders as O on A.id = O.attendant_id where O.id = {rq.OrderId}";
-                var getPlaneIdResponse = await connection.QueryAsync<Attendant>(getPlaneIdQuery).ConfigureAwait(false);
+                string getPlaneIdQuery = $"select A.plane_id as planeId, P.status from attendants as A inner join orders as O on A.id = O.attendant_id inner join Planes as P on P.id = A.plane_id where O.id = {rq.OrderId}";
+                var getPlaneIdResponse = await connection.QueryAsync<Plane>(getPlaneIdQuery).ConfigureAwait(false);
 
-                int planeId = getPlaneIdResponse.ToList()[0].PlaneId;
+                if (getPlaneIdResponse.ToList()[0].Status == 1)
+                {
+                    return false;
+                }
+
+                int planeId = getPlaneIdResponse.ToList()[0].Id;
 
                 string getOrderLinesQuery = $"select id, product_id as ProductId, order_id as OrderId, quantity from orderlines where order_id = {rq.OrderId}";
                 var getOrderLinesResponse = await connection.QueryAsync<OrderLine>(getOrderLinesQuery).ConfigureAwait(false);

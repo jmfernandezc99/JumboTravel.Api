@@ -64,7 +64,7 @@ namespace JumboTravel.Api.src.Controllers
             {
                 var result = await _orderService.CompleteOrder(rq).ConfigureAwait(false);
 
-                return result ? Ok(result) : BadRequest("Bad request");
+                return Ok(result);
             }
             catch (Exception ex)
             {
