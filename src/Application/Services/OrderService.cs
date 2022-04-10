@@ -152,7 +152,7 @@ namespace JumboTravel.Api.src.Application.Services
                 string createNotificationQuery = $"INSERT INTO NOTIFICATIONS (user_id, title, description) VALUES ({attendantId}, 'Recarga avión', 'Su avión ha sido recargado')";
                 await connection.ExecuteAsync(createNotificationQuery).ConfigureAwait(false);
 
-                string updateOrderToCompleted = $"UPDATE orders SET status = 'completed' where attendant_id = {attendantId} and status = 'progress'";
+                string updateOrderToCompleted = $"UPDATE orders SET status = 'completed' where attendant_id = {attendantId} and status = 'progress' and id = {rq.OrderId}";
                 await connection.ExecuteAsync(updateOrderToCompleted).ConfigureAwait(false);
 
                 return true;
