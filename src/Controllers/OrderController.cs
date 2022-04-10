@@ -20,11 +20,11 @@ namespace JumboTravel.Api.src.Controllers
             _orderService = orderService ?? throw new ArgumentNullException(nameof(orderService));
         }
 
-        [HttpGet("ObtainInvoice")]
+        [HttpPost("ObtainInvoice")]
         [ProducesResponseType(typeof(ObtainInvoiceResponse), StatusCodes.Status200OK)]
-        public async Task<IActionResult> ObtainInvoice([FromQuery] int orderId)
+        public async Task<IActionResult> ObtainInvoice([FromBody] ObtainInvoiceRequest request)
         {
-            var result = await _orderService.ObtainInvoice(orderId).ConfigureAwait(false);
+            var result = await _orderService.ObtainInvoice(request).ConfigureAwait(false);
 
             if (result == null)
             {

@@ -171,11 +171,11 @@ namespace JumboTravel.Api.src.Application.Services
             }
         }
 
-        public async Task<ObtainInvoiceResponse?> ObtainInvoice(int orderId)
+        public async Task<ObtainInvoiceResponse?> ObtainInvoice(ObtainInvoiceRequest rq)
         {
             using (var connection = _context.CreateConnection())
             {
-                string getProductsQuery = $"select P.name as ProductName, OL.quantity, P.price from Products as P inner join OrderLines as OL ON P.id = OL.product_id where OL.order_id = {orderId}";
+                string getProductsQuery = $"select P.name as ProductName, OL.quantity, P.price from Products as P inner join OrderLines as OL ON P.id = OL.product_id inner join Orders as O on OL.order_id = O.id where O.date = '{rq.Date}' and O.base = '{rq.Base}'" ;
                 var getProductsResponse = await connection.QueryAsync<ObtainInvoicePropertiesResponse>(getProductsQuery).ConfigureAwait(false);
                 var productsDetails = getProductsResponse.ToList();
 
@@ -183,11 +183,12 @@ namespace JumboTravel.Api.src.Application.Services
 
                 foreach (var item in productsDetails)
                 {
+                    item.PricePerUnit = item.Price;
                     item.Price = item.Price * item.Quantity;
                     totalPrice += item.Price;
                 }
 
-                return new ObtainInvoiceResponse() { OrderId = orderId, Properties = productsDetails, TotalPrice = totalPrice };
+                return new ObtainInvoiceResponse() { Properties = productsDetails, TotalPrice = totalPrice };
             }
         }
     }
