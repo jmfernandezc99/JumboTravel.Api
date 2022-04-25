@@ -1,6 +1,10 @@
 using JumboTravel.Api.src.Application.Data;
 using JumboTravel.Api.src.Application.Services;
 using JumboTravel.Api.src.Domain.Interfaces.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Configuration;
+using System.Text;
 
 string MyAllowSpecificOrigins = "JumboTravel";
 
@@ -8,6 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddHealthChecks();
 
+// CORS Configuration
 builder.Services.AddCors(o =>
 {
     o.AddPolicy(name: MyAllowSpecificOrigins, builder =>
@@ -27,6 +32,34 @@ builder.Services.AddScoped<IPlaneService, PlaneService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 
+var configuration = new ConfigurationBuilder()
+     .AddJsonFile($"appsettings.development.json");
+
+var _configuration = configuration.Build();
+
+// JWT Configuration
+builder.Services.AddAuthentication(
+        options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        }
+    ).AddJwtBearer(o =>
+    {
+        var key = Encoding.UTF8.GetBytes(_configuration["JWT:Key"]);
+        o.SaveToken = true;
+        o.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = _configuration["JWT:Issuer"],
+            ValidAudience = _configuration["JWT:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+            ValidateLifetime = true,
+            ValidateIssuer = false,
+            ValidateAudience = false
+        };
+    });
+
 // Add services to the container.
 builder.Services.AddControllers();
 
@@ -44,6 +77,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors(MyAllowSpecificOrigins);
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

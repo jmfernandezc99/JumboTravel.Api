@@ -1,12 +1,14 @@
 ﻿using JumboTravel.Api.src.Domain.Interfaces.Services;
 using JumboTravel.Api.src.Domain.Models.Users.Requests;
 using JumboTravel.Api.src.Domain.Models.Users.Responses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JumboTravel.Api.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [Authorize]
     public class UserController : ControllerBase
     {
         private readonly ILogger<UserController> _logger;
@@ -18,6 +20,7 @@ namespace JumboTravel.Api.Controllers
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
 
+        [AllowAnonymous]
         [HttpPost("Login")]
         [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]

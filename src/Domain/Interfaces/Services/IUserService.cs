@@ -5,6 +5,6 @@ namespace JumboTravel.Api.src.Domain.Interfaces.Services
 {
     public interface IUserService
     {
-        Task<LoginResponse?> Login(LoginRequest rq);
+        Task<LoginResponse> Login(LoginRequest rq);
     }
 }
