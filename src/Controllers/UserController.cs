@@ -1,4 +1,5 @@
-﻿using JumboTravel.Api.src.Domain.Interfaces.Services;
+﻿using JumboTravel.Api.src.Application.Extensions;
+using JumboTravel.Api.src.Domain.Interfaces.Services;
 using JumboTravel.Api.src.Domain.Models.Users.Requests;
 using JumboTravel.Api.src.Domain.Models.Users.Responses;
 using Microsoft.AspNetCore.Authorization;
@@ -30,7 +31,23 @@ namespace JumboTravel.Api.Controllers
             {
                 var result = await _userService.Login(rq).ConfigureAwait(false);
 
-                return result != null ? Ok(result) : NoContent();
+                return result.Exit == 0 ? Ok(result) : NoContent();
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError(exception, "Error in Login, in UserController");
+                throw;
+            }
+        }
+
+        [HttpGet("LoginWithToken")]
+        public async Task<IActionResult> LoginWithToken([FromHeader] string authorization)
+        {
+            try
+            {
+                var result = await _userService.Login(new LoginRequest() { JsonWebToken = authorization }).ConfigureAwait(false);
+
+                return result.Exit == 0 ? Ok(result) : Ok(result.Message);
             }
             catch (Exception exception)
             {

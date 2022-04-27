@@ -3,7 +3,6 @@ using JumboTravel.Api.src.Application.Services;
 using JumboTravel.Api.src.Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using System.Configuration;
 using System.Text;
 
 string MyAllowSpecificOrigins = "JumboTravel";
@@ -50,13 +49,13 @@ builder.Services.AddAuthentication(
         o.SaveToken = true;
         o.TokenValidationParameters = new TokenValidationParameters
         {
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
             ValidIssuer = _configuration["JWT:Issuer"],
             ValidAudience = _configuration["JWT:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(key),
-            ValidateLifetime = true,
-            ValidateIssuer = false,
-            ValidateAudience = false
+            IssuerSigningKey = new SymmetricSecurityKey(key)            
         };
     });
 
