@@ -18,7 +18,7 @@ namespace JumboTravel.Api.src.Application.Extensions
                 {
                     new Claim(ClaimTypes.Name, data!)
                 }),
-                Expires = DateTime.Now.AddDays(1),
+                Expires = DateTime.Now.AddHours(2).AddMinutes(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(tokenKey), SecurityAlgorithms.HmacSha256Signature),
             };
 
@@ -29,6 +29,7 @@ namespace JumboTravel.Api.src.Application.Extensions
         public static User ReturnUserFromToken(string token)
         {
             var tokenConverted = new JwtSecurityToken(token.Replace("Bearer ", ""));
+
             return new User()
             {
                 Nif = tokenConverted.Claims.FirstOrDefault()!.ToString().Replace("unique_name: ", "")

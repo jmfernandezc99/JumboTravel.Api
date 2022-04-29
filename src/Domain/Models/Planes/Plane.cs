@@ -2,7 +2,7 @@
 {
     public class Plane
     {
-        public int Id { get; set; }
+        public int PlaneId { get; set; }
         public string? Name { get; set; }
         public int Status { get; set; }
     }

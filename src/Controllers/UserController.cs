@@ -51,7 +51,21 @@ namespace JumboTravel.Api.Controllers
             }
             catch (Exception exception)
             {
-                _logger.LogError(exception, "Error in Login, in UserController");
+                _logger.LogError(exception, "Error in LoginWithToken, in UserController");
+                throw;
+            }
+        }
+
+        [HttpGet("ValidateToken")]
+        public IActionResult ValidateToken([FromHeader] string authorization)
+        {
+            try
+            {
+                return Ok(JwtExtension.ValidateToken(authorization));
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError(exception, "Error in ValidateToken, in UserController");
                 throw;
             }
         }

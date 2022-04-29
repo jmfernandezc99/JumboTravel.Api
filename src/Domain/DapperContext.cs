@@ -14,7 +14,6 @@ namespace JumboTravel.Api.src.Application.Data
             _connectionString = _configuration.GetConnectionString("SqlConnection");
         }
 
-        public IDbConnection CreateConnection()
-            => new NpgsqlConnection(_connectionString);
+        public IDbConnection CreateConnection() => new NpgsqlConnection(_connectionString);
     }
 }

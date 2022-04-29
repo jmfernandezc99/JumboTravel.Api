@@ -22,9 +22,9 @@ namespace JumboTravel.Api.src.Controllers
 
         [HttpPost("ObtainInvoice")]
         [ProducesResponseType(typeof(ObtainInvoiceResponse), StatusCodes.Status200OK)]
-        public async Task<IActionResult> ObtainInvoice([FromBody] ObtainInvoiceRequest request)
+        public async Task<IActionResult> ObtainInvoice([FromHeader] string authorization, [FromBody] ObtainInvoiceRequest request)
         {
-            var result = await _orderService.ObtainInvoice(request).ConfigureAwait(false);
+            var result = await _orderService.ObtainInvoice(request, authorization).ConfigureAwait(false);
 
             if (result == null)
             {
@@ -36,11 +36,11 @@ namespace JumboTravel.Api.src.Controllers
 
         [HttpPost("CreateOrder")]
         [ProducesResponseType(typeof(CreateOrderResponse), StatusCodes.Status200OK)]
-        public async Task<IActionResult> CreateOrder([FromBody] CreateOrderRequest rq)
+        public async Task<IActionResult> CreateOrder([FromHeader] string authorization, [FromBody] CreateOrderRequest rq)
         {
             try
             {
-                var result = await _orderService.CreateOrder(rq).ConfigureAwait(false);
+                var result = await _orderService.CreateOrder(rq, authorization).ConfigureAwait(false);
 
                 if (result == null)
                 {
@@ -58,11 +58,11 @@ namespace JumboTravel.Api.src.Controllers
 
         [HttpPost("CompleteOrder")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-        public async Task<IActionResult> CompleteOrder([FromBody] CompleteOrderRequest rq)
+        public async Task<IActionResult> CompleteOrder([FromHeader] string authorization, [FromBody] CompleteOrderRequest rq)
         {
             try
             {
-                var result = await _orderService.CompleteOrder(rq).ConfigureAwait(false);
+                var result = await _orderService.CompleteOrder(rq, authorization).ConfigureAwait(false);
 
                 return Ok(result);
             }
@@ -75,11 +75,11 @@ namespace JumboTravel.Api.src.Controllers
 
         [HttpGet("CanCreateOrder")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-        public async Task<IActionResult> CanCreateOrder([FromQuery] string userId)
+        public async Task<IActionResult> CanCreateOrder([FromHeader] string authorization)
         {
             try
             {
-                var result = await _orderService.CanCreateOrder(userId).ConfigureAwait(false);
+                var result = await _orderService.CanCreateOrder(authorization).ConfigureAwait(false);
 
                 return Ok(result);
             }
@@ -93,7 +93,7 @@ namespace JumboTravel.Api.src.Controllers
         [HttpGet("GetAllOrdersByBase")]
         [ProducesResponseType(typeof(List<Order>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<IActionResult> GetAllOrdersByBase([FromQuery] string location)
+        public async Task<IActionResult> GetAllOrdersByBase([FromHeader] string authorization, [FromQuery] string location)
         {
             try
             {
@@ -116,7 +116,7 @@ namespace JumboTravel.Api.src.Controllers
         [HttpGet("GetOrdersByBase")]
         [ProducesResponseType(typeof(List<Order>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<IActionResult> GetOrdersByBase([FromQuery] string location)
+        public async Task<IActionResult> GetOrdersByBase([FromHeader] string authorization, [FromQuery] string location)
         {
             try
             {
@@ -139,11 +139,11 @@ namespace JumboTravel.Api.src.Controllers
         [HttpGet("GetOrders")]
         [ProducesResponseType(typeof(List<Order>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<IActionResult> GetOrders([FromQuery] string userId)
+        public async Task<IActionResult> GetOrders([FromHeader] string authorization)
         {
             try
             {
-                var result = await _orderService.GetOrders(userId).ConfigureAwait(false);
+                var result = await _orderService.GetOrders(authorization).ConfigureAwait(false);
 
                 if (result.Count < 1)
                 {
@@ -162,11 +162,11 @@ namespace JumboTravel.Api.src.Controllers
         [HttpGet("GetOrderLinesByOrderId")]
         [ProducesResponseType(typeof(List<OrderLine>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<IActionResult> GetOrderLinesByOrderId([FromQuery] string orderId)
+        public async Task<IActionResult> GetOrderLinesByOrderId([FromHeader] string authorization, [FromQuery] string orderId)
         {
             try
             {
-                var result = await _orderService.GetOrderLinesByOrderId(orderId).ConfigureAwait(false);
+                var result = await _orderService.GetOrderLinesByOrderId(orderId, authorization).ConfigureAwait(false);
 
                 if (result.Count < 1)
                 {

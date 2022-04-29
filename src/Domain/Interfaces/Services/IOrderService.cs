@@ -7,13 +7,13 @@ namespace JumboTravel.Api.src.Domain.Interfaces.Services
 {
     public interface IOrderService
     {
-        Task<CreateOrderResponse?> CreateOrder(CreateOrderRequest rq);
-        Task<bool> CompleteOrder(CompleteOrderRequest rq);
-        Task<List<Order>> GetOrders(string userId);
-        Task<ObtainInvoiceResponse?> ObtainInvoice(ObtainInvoiceRequest rq);
+        Task<CreateOrderResponse?> CreateOrder(CreateOrderRequest rq, string authorization);
+        Task<bool> CompleteOrder(CompleteOrderRequest rq, string authorization);
+        Task<List<Order>> GetOrders(string authorization);
+        Task<ObtainInvoiceResponse?> ObtainInvoice(ObtainInvoiceRequest rq, string authorization);
         Task<List<Order>> GetOrdersByBase(string location);
         Task<List<Order>> GetAllOrdersByBase(string location);
-        Task<bool> CanCreateOrder(string userId);
-        Task<List<GetOrderLinesResponse>> GetOrderLinesByOrderId(string orderId);
+        Task<bool> CanCreateOrder(string authorization);
+        Task<List<GetOrderLinesResponse>> GetOrderLinesByOrderId(string orderId, string authorization);
     }
 }

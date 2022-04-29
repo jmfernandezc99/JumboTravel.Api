@@ -20,11 +20,11 @@ namespace JumboTravel.Api.src.Controllers
         [HttpGet("GetNotifications")]
         [ProducesResponseType(typeof(List<Notification>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<IActionResult> GetNotifications([FromQuery] string userId)
+        public async Task<IActionResult> GetNotifications([FromHeader] string authorization)
         {
             try
             {
-                var result = await _notificationService.GetNotifications(userId).ConfigureAwait(false);
+                var result = await _notificationService.GetNotifications(authorization).ConfigureAwait(false);
 
                 if (result.Count() < 1)
                 {

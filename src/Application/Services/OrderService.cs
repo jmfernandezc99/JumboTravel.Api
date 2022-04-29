@@ -23,21 +23,24 @@ namespace JumboTravel.Api.src.Application.Services
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
-        public async Task<CreateOrderResponse?> CreateOrder(CreateOrderRequest rq)
+        public async Task<CreateOrderResponse?> CreateOrder(CreateOrderRequest rq, string token)
         {
-            int decryptedId = EncryptExtension.Decrypt(rq.UserId!);
+            User user = JwtExtension.ReturnUserFromToken(token);
 
             using (var connection = _context.CreateConnection())
             {
+                string queryGetUser = $"select * from users where nif = '{user.Nif}'";
+                var users = await connection.QueryAsync<User>(queryGetUser).ConfigureAwait(false);
+
                 DateTime now = DateTime.Now.Date;
                 string date = now.ToString("yyyy-MM-dd");
 
                 string queryCreateOrder = $"INSERT INTO orders(attendant_id, base, date, status) " +
-                    $"VALUES ({decryptedId}, '{rq.Base}', '{date}', 'progress')";
+                    $"VALUES ({users.FirstOrDefault()!.Id}, '{rq.Base}', '{date}', 'progress')";
 
                 var createOrderResponse = await connection.ExecuteAsync(queryCreateOrder, new Order()).ConfigureAwait(false);
 
-                string queryGetOrder = $"select id from orders where date = '{date}' and attendant_id = {decryptedId}";
+                string queryGetOrder = $"select id from orders where date = '{date}' and attendant_id = {users.FirstOrDefault()!.Id}";
 
                 var getOrderQueryResponse = await connection.QueryAsync<Order>(queryGetOrder).ConfigureAwait(false);
 
@@ -62,20 +65,23 @@ namespace JumboTravel.Api.src.Application.Services
             }
         }
 
-        public async Task<List<Order>> GetOrders(string userId)
+        public async Task<List<Order>> GetOrders(string token)
         {
-            int decryptedId = EncryptExtension.Decrypt(userId);
+            User user = JwtExtension.ReturnUserFromToken(token);
 
             using (var connection = _context.CreateConnection())
             {
-                string getOrdersQuery = $"select id, base, date, status from orders where attendant_id = {decryptedId}";
+                string queryGetUser = $"select * from users where nif = '{user.Nif}'";
+                var users = await connection.QueryAsync<User>(queryGetUser).ConfigureAwait(false);
+
+                string getOrdersQuery = $"select id, base, date, status from orders where attendant_id = {users.FirstOrDefault()!.Id}";
                 var getOrdersResponse = await connection.QueryAsync<Order>(getOrdersQuery).ConfigureAwait(false);
 
                 return getOrdersResponse.Count() > 0 ? getOrdersResponse.ToList() : new List<Order>();
             }
         }
 
-        public async Task<List<GetOrderLinesResponse>> GetOrderLinesByOrderId(string orderId)
+        public async Task<List<GetOrderLinesResponse>> GetOrderLinesByOrderId(string orderId, string token)
         {
             using (var connection = _context.CreateConnection())
             {
@@ -86,13 +92,16 @@ namespace JumboTravel.Api.src.Application.Services
             }
         }
 
-        public async Task<bool> CanCreateOrder(string userId)
+        public async Task<bool> CanCreateOrder(string token)
         {
-            int decryptedId = EncryptExtension.Decrypt(userId);
+            User user = JwtExtension.ReturnUserFromToken(token);
 
             using (var connection = _context.CreateConnection())
             {
-                string getPlaneStatusQuery = $"select P.status from planes as P inner join attendants as A on P.id = A.plane_id where A.id = {decryptedId}";
+                string queryGetUser = $"select * from users where nif = '{user.Nif}'";
+                var users = await connection.QueryAsync<User>(queryGetUser).ConfigureAwait(false);
+
+                string getPlaneStatusQuery = $"select P.status from planes as P inner join attendants as A on P.id = A.plane_id where A.id = { users.FirstOrDefault()!.Id }";
                 var getPlaneStatusResponse = await connection.QueryAsync<Plane>(getPlaneStatusQuery).ConfigureAwait(false);
 
                 int planeStatus = getPlaneStatusResponse.ToList()[0].Status;
@@ -102,7 +111,7 @@ namespace JumboTravel.Api.src.Application.Services
                     return false;
                 }
 
-                string getOrdersQuery = $"select status from orders where attendant_id = {decryptedId}";
+                string getOrdersQuery = $"select status from orders where attendant_id = { users.FirstOrDefault()!.Id }";
                 var getOrdersResponse = await connection.QueryAsync<Order>(getOrdersQuery).ConfigureAwait(false);
                 bool response = true;
 
@@ -130,10 +139,20 @@ namespace JumboTravel.Api.src.Application.Services
             }
         }
 
-        public async Task<bool> CompleteOrder(CompleteOrderRequest rq)
+        public async Task<bool> CompleteOrder(CompleteOrderRequest rq, string token)
         {
+            User user = JwtExtension.ReturnUserFromToken(token);
+
             using (var connection = _context.CreateConnection())
             {
+                string queryGetUser = $"select * from users where nif = '{user.Nif}'";
+                var users = await connection.QueryAsync<User>(queryGetUser).ConfigureAwait(false);
+
+                if (users.ToList().Count < 1)
+                {
+                    return false;
+                }
+
                 string getPlaneIdQuery = $"select A.plane_id as planeId, P.status from attendants as A inner join orders as O on A.id = O.attendant_id inner join Planes as P on P.id = A.plane_id where O.id = {rq.OrderId}";
                 var getPlaneIdResponse = await connection.QueryAsync<Plane>(getPlaneIdQuery).ConfigureAwait(false);
 
@@ -142,7 +161,7 @@ namespace JumboTravel.Api.src.Application.Services
                     return false;
                 }
 
-                int planeId = getPlaneIdResponse.ToList()[0].Id;
+                int planeId = getPlaneIdResponse.ToList()[0].PlaneId;
 
                 string getOrderLinesQuery = $"select id, product_id as ProductId, order_id as OrderId, quantity from orderlines where order_id = {rq.OrderId}";
                 var getOrderLinesResponse = await connection.QueryAsync<OrderLine>(getOrderLinesQuery).ConfigureAwait(false);
@@ -187,10 +206,19 @@ namespace JumboTravel.Api.src.Application.Services
             }
         }
 
-        public async Task<ObtainInvoiceResponse?> ObtainInvoice(ObtainInvoiceRequest rq)
+        public async Task<ObtainInvoiceResponse?> ObtainInvoice(ObtainInvoiceRequest rq, string authorization)
         {
             using (var connection = _context.CreateConnection())
             {
+                User user = JwtExtension.ReturnUserFromToken(authorization);
+                string queryGetUser = $"select * from users where nif = '{user.Nif}'";
+                var users = await connection.QueryAsync<User>(queryGetUser).ConfigureAwait(false);
+
+                if (users.ToList().Count() < 1)
+                {
+                    return new ObtainInvoiceResponse() { Message = "Not found user with token" };
+                }
+
                 string getProductsQuery = $"select P.name as ProductName, OL.quantity, P.price from Products as P inner join OrderLines as OL ON P.id = OL.product_id inner join Orders as O on OL.order_id = O.id where O.date = '{rq.Date}' and O.base = '{rq.Base}'" ;
                 var getProductsResponse = await connection.QueryAsync<ObtainInvoicePropertiesResponse>(getProductsQuery).ConfigureAwait(false);
                 var productsDetails = getProductsResponse.ToList();

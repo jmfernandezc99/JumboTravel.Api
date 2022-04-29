@@ -5,6 +5,6 @@ namespace JumboTravel.Api.src.Domain.Interfaces.Services
 {
     public interface IPlaneService
     {
-        Task<List<PlaneStockResponse>> GetPlaneStock(PlaneStockRequest rq);
+        Task<List<PlaneStockResponse>> GetPlaneStock(string authorization);
     }
 }
