@@ -1,11 +1,13 @@
 ﻿using JumboTravel.Api.src.Domain.Interfaces.Services;
 using JumboTravel.Api.src.Domain.Models.Notifications;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JumboTravel.Api.src.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [Authorize]
     public class NotificationController : ControllerBase
     {
         private readonly ILogger<NotificationController> _logger;

@@ -1,5 +1,4 @@
 ﻿using JumboTravel.Api.src.Domain.Interfaces.Services;
-using JumboTravel.Api.src.Domain.Models.PlaneStocks.Requests;
 using JumboTravel.Api.src.Domain.Models.PlaneStocks.Responses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

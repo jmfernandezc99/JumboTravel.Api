@@ -36,13 +36,13 @@ namespace JumboTravel.Api.src.Application.Services
 
                 var response = await connection.QueryAsync<User>(query).ConfigureAwait(false);
                 var users = response.ToList();
-                
-                User? user = !string.IsNullOrEmpty(rq.JsonWebToken) 
-                            ? users.Where(user => user.Nif == JwtExtension.ReturnUserFromToken(rq.JsonWebToken).Nif).FirstOrDefault() 
+
+                User? user = !string.IsNullOrEmpty(rq.JsonWebToken)
+                            ? users.Where(user => user.Nif == JwtExtension.ReturnUserFromToken(rq.JsonWebToken).Nif).FirstOrDefault()
                             : users.Where(user => user.Nif == rq.UserName && user.Password == rq.Password).FirstOrDefault();
 
                 if (user == null)
-                    return new LoginResponse() { Exit = 1};
+                    return new LoginResponse() { Exit = 1 };
 
                 List<string> origins = new List<string>();
 

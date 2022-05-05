@@ -2,7 +2,6 @@
 using JumboTravel.Api.src.Application.Data;
 using JumboTravel.Api.src.Application.Extensions;
 using JumboTravel.Api.src.Domain.Interfaces.Services;
-using JumboTravel.Api.src.Domain.Models.Attendants;
 using JumboTravel.Api.src.Domain.Models.OrderLines;
 using JumboTravel.Api.src.Domain.Models.OrderLines.Responses;
 using JumboTravel.Api.src.Domain.Models.Orders;
@@ -127,10 +126,19 @@ namespace JumboTravel.Api.src.Application.Services
             }
         }
 
-        public async Task<List<Order>> GetOrdersByBase(string location)
+        public async Task<List<Order>> GetOrdersByBase(string location, string token)
         {
             using (var connection = _context.CreateConnection())
             {
+                User user = JwtExtension.ReturnUserFromToken(token);
+                string queryGetUser = $"select * from users where nif = '{user.Nif}'";
+                var users = await connection.QueryAsync<User>(queryGetUser).ConfigureAwait(false);
+
+                if (users.ToList().Count() < 1)
+                {
+                    return new List<Order>();
+                }
+
                 string getOrdersQuery = $"select O.id, O.base, O.date, O.status, P.name as plane from orders as O inner join attendants as A ON O.attendant_id = A.id " +
                     $"inner join Planes as P ON A.plane_id = P.id where O.base = '{location}' and O.status = 'progress'";
                 var getOrdersResponse = await connection.QueryAsync<Order>(getOrdersQuery).ConfigureAwait(false);
@@ -194,10 +202,19 @@ namespace JumboTravel.Api.src.Application.Services
             }
         }
 
-        public async Task<List<Order>> GetAllOrdersByBase(string location)
+        public async Task<List<Order>> GetAllOrdersByBase(string location, string token)
         {
             using (var connection = _context.CreateConnection())
             {
+                User user = JwtExtension.ReturnUserFromToken(token);
+                string queryGetUser = $"select * from users where nif = '{user.Nif}'";
+                var users = await connection.QueryAsync<User>(queryGetUser).ConfigureAwait(false);
+
+                if (users.ToList().Count() < 1)
+                {
+                    return new List<Order>();
+                }
+
                 string getOrdersQuery = $"select O.id, O.base, O.date, O.status, P.name as plane from orders as O inner join attendants as A ON O.attendant_id = A.id " +
                     $"inner join Planes as P ON A.plane_id = P.id where O.base = '{location}'";
                 var getOrdersResponse = await connection.QueryAsync<Order>(getOrdersQuery).ConfigureAwait(false);
@@ -219,7 +236,7 @@ namespace JumboTravel.Api.src.Application.Services
                     return new ObtainInvoiceResponse() { Message = "Not found user with token" };
                 }
 
-                string getProductsQuery = $"select P.name as ProductName, OL.quantity, P.price from Products as P inner join OrderLines as OL ON P.id = OL.product_id inner join Orders as O on OL.order_id = O.id where O.date = '{rq.Date}' and O.base = '{rq.Base}'" ;
+                string getProductsQuery = $"select P.name as ProductName, OL.quantity, P.price from Products as P inner join OrderLines as OL ON P.id = OL.product_id inner join Orders as O on OL.order_id = O.id where O.date = '{rq.Date}' and O.base = '{rq.Base}'";
                 var getProductsResponse = await connection.QueryAsync<ObtainInvoicePropertiesResponse>(getProductsQuery).ConfigureAwait(false);
                 var productsDetails = getProductsResponse.ToList();
 
@@ -228,7 +245,7 @@ namespace JumboTravel.Api.src.Application.Services
                 foreach (var item in productsDetails)
                 {
                     item.PricePerUnit = item.Price;
-                    item.Price = item.Price * item.Quantity;
+                    item.Price *= item.Quantity;
                     totalPrice += item.Price;
                 }
 

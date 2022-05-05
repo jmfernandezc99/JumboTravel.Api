@@ -55,7 +55,7 @@ builder.Services.AddAuthentication(
             ValidateIssuerSigningKey = true,
             ValidIssuer = _configuration["JWT:Issuer"],
             ValidAudience = _configuration["JWT:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(key)            
+            IssuerSigningKey = new SymmetricSecurityKey(key)
         };
     });
 

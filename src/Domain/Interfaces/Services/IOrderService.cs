@@ -11,8 +11,8 @@ namespace JumboTravel.Api.src.Domain.Interfaces.Services
         Task<bool> CompleteOrder(CompleteOrderRequest rq, string authorization);
         Task<List<Order>> GetOrders(string authorization);
         Task<ObtainInvoiceResponse?> ObtainInvoice(ObtainInvoiceRequest rq, string authorization);
-        Task<List<Order>> GetOrdersByBase(string location);
-        Task<List<Order>> GetAllOrdersByBase(string location);
+        Task<List<Order>> GetOrdersByBase(string location, string authorization);
+        Task<List<Order>> GetAllOrdersByBase(string location, string authorization);
         Task<bool> CanCreateOrder(string authorization);
         Task<List<GetOrderLinesResponse>> GetOrderLinesByOrderId(string orderId, string authorization);
     }

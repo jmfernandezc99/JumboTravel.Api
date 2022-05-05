@@ -3,12 +3,14 @@ using JumboTravel.Api.src.Domain.Models.OrderLines;
 using JumboTravel.Api.src.Domain.Models.Orders;
 using JumboTravel.Api.src.Domain.Models.Orders.Requests;
 using JumboTravel.Api.src.Domain.Models.Orders.Responses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JumboTravel.Api.src.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [Authorize]
     public class OrderController : ControllerBase
     {
         private readonly ILogger<OrderController> _logger;
@@ -97,7 +99,7 @@ namespace JumboTravel.Api.src.Controllers
         {
             try
             {
-                var result = await _orderService.GetAllOrdersByBase(location).ConfigureAwait(false);
+                var result = await _orderService.GetAllOrdersByBase(location, authorization).ConfigureAwait(false);
 
                 if (result.Count < 1)
                 {
@@ -120,7 +122,7 @@ namespace JumboTravel.Api.src.Controllers
         {
             try
             {
-                var result = await _orderService.GetOrdersByBase(location).ConfigureAwait(false);
+                var result = await _orderService.GetOrdersByBase(location, authorization).ConfigureAwait(false);
 
                 if (result.Count < 1)
                 {
