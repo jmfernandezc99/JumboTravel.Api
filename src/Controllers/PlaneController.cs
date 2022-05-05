@@ -20,7 +20,7 @@ namespace JumboTravel.Api.src.Controllers
         }
 
         [HttpGet("GetPlaneStock")]
-        [ProducesResponseType(typeof(List<PlaneStockResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(GetPlaneStockResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> GetPlaneStock([FromHeader] string authorization)
         {
@@ -28,7 +28,7 @@ namespace JumboTravel.Api.src.Controllers
             {
                 var result = await _plainService.GetPlaneStock(authorization).ConfigureAwait(false);
 
-                return result.Count > 0 ? Ok(result) : NoContent();
+                return !string.IsNullOrEmpty(result.Plane) ? Ok(result) : NoContent();
             }
             catch (Exception ex)
             {

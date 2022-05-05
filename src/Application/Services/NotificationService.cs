@@ -27,7 +27,7 @@ namespace JumboTravel.Api.src.Application.Services
                 string queryGetNotifications = $"SELECT id, title, user_id as UserId, description from notifications where user_id = {users.FirstOrDefault()!.Id}";
 
                 var getNotificationsResponse = await connection.QueryAsync<Notification>(queryGetNotifications).ConfigureAwait(false);
-                return getNotificationsResponse.Count() > 0 ? getNotificationsResponse.ToList() : new List<Notification>();
+                return getNotificationsResponse.Count() > 0 ? getNotificationsResponse.Reverse().ToList() : new List<Notification>();
             }
         }
     }

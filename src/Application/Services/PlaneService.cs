@@ -2,6 +2,7 @@
 using JumboTravel.Api.src.Application.Data;
 using JumboTravel.Api.src.Application.Extensions;
 using JumboTravel.Api.src.Domain.Interfaces.Services;
+using JumboTravel.Api.src.Domain.Models.Planes;
 using JumboTravel.Api.src.Domain.Models.PlaneStocks.Responses;
 using JumboTravel.Api.src.Domain.Models.Users;
 
@@ -14,7 +15,7 @@ namespace JumboTravel.Api.src.Application.Services
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
-        public async Task<List<PlaneStockResponse>> GetPlaneStock(string authorization)
+        public async Task<GetPlaneStockResponse> GetPlaneStock(string authorization)
         {
             User user = JwtExtension.ReturnUserFromToken(authorization);
 
@@ -27,8 +28,16 @@ namespace JumboTravel.Api.src.Application.Services
                     $"on A.plane_id = PL.id inner join planestock as PS on PL.id = PS.plane_id inner join products as P " +
                     $"on PS.product_id = P.id where A.user_id = {users.FirstOrDefault()!.Id}";
 
+                string queryGetPlane = $"select P.name, P.status from Planes as P inner join attendants as A on A.plane_id = P.id where A.user_id = { users.FirstOrDefault()!.Id }";
+
+                var queryGetPlaneResponse = await connection.QueryAsync<Plane>(queryGetPlane).ConfigureAwait(false);
                 var queryGetStockResponse = await connection.QueryAsync<PlaneStockResponse>(queryGetStock).ConfigureAwait(false);
-                return queryGetStockResponse.ToList();
+                return !string.IsNullOrEmpty(queryGetPlaneResponse.FirstOrDefault()!.Name) ? new GetPlaneStockResponse()
+                {
+                    Plane = queryGetPlaneResponse.FirstOrDefault()!.Name!,
+                    Status = queryGetPlaneResponse.FirstOrDefault()!.Status,
+                    Stock = queryGetStockResponse.ToList()
+                } : new GetPlaneStockResponse();
             }
         }
     }
