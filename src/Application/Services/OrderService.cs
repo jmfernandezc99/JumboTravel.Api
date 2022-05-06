@@ -53,6 +53,16 @@ namespace JumboTravel.Api.src.Application.Services
                     var getProductIdResponse = await connection.QueryAsync<Product>(queryProductId).ConfigureAwait(false);
                     var product = getProductIdResponse.FirstOrDefault();
 
+                    string queryMaxStockPerProduct = $"select maximum_quantity, quantity from planestock where product_id = {product!.Id}";
+                    var getMaxStockPerProduct = await connection.QueryAsync<PlaneStock>(queryMaxStockPerProduct).ConfigureAwait(false);
+                    int maxStock = getMaxStockPerProduct.FirstOrDefault()!.MaximumQuantity;
+                    int quantity = getMaxStockPerProduct.FirstOrDefault()!.Quantity;
+
+                    if (rq.Properties[i].Quantity + quantity > maxStock)
+                    {
+                        return new CreateOrderResponse() { OutOfRange = true };
+                    }
+
                     queryCreateOrderLines += $"({product!.Id}, {order!.Id}, {rq.Properties[i].Quantity})";
 
                     queryCreateOrderLines += (i + 1) == rq.Properties.Count ? ";" : ",";
@@ -60,7 +70,7 @@ namespace JumboTravel.Api.src.Application.Services
 
                 var createOrderLines = await connection.ExecuteAsync(queryCreateOrderLines).ConfigureAwait(false);
 
-                return createOrderLines > 0 ? new CreateOrderResponse() { IsCreated = true, OrderId = order!.Id } : null;
+                return createOrderLines > 0 ? new CreateOrderResponse() { IsCreated = true, OrderId = order!.Id, OutOfRange = false } : null;
             }
         }
 

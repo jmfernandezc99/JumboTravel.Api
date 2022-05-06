@@ -4,5 +4,6 @@
     {
         public bool IsCreated { get; set; }
         public int OrderId { get; set; }
+        public bool OutOfRange { get; set; }
     }
 }
