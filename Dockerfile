@@ -11,4 +11,4 @@ ENV ASPNETCORE_URLS http://+:5000
 WORKDIR /app
 COPY --from=build /app/jumbotravel/out .
 ENV DOTNET_EnableDiagnostics=0
-ENTRYPOINT ["./JumboTravel.Api"]
+ENTRYPOINT ["./"]
