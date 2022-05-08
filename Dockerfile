@@ -1,5 +1,6 @@
 FROM mcr.microsoft.com/dotnet/sdk:6.0-focal AS build
 COPY ["*.csproj", "/app/jumbotravel/"]
+COPY ["appsettings.json", "/app/jumbotravel/"]
 WORKDIR /app/jumbotravel
 RUN dotnet restore
 
