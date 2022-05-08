@@ -3,7 +3,7 @@ COPY ["*.csproj", "/app/jumbotravel/"]
 WORKDIR /app/jumbotravel
 RUN dotnet restore
 
-COPY ./* ./
+COPY . ./
 RUN dotnet publish -c release -o out
 
 FROM mcr.microsoft.com/dotnet/aspnet:6.0-focal
