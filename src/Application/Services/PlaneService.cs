@@ -15,6 +15,43 @@ namespace JumboTravel.Api.src.Application.Services
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
+
+        public async Task<bool> ChangePlaneStatus(string authorization)
+        {
+            User user = JwtExtension.ReturnUserFromToken(authorization);
+
+            using (var connection = _context.CreateConnection())
+            {
+                string queryGetUser = $"select * from users where nif = '{user.Nif}'";
+                var users = await connection.QueryAsync<User>(queryGetUser).ConfigureAwait(false);
+
+                string queryGetStock = $"select status, p.id as planeid from planes as p inner join attendants as a on a.plane_id = p.id where user_id = { users.FirstOrDefault()!.Id }";
+
+                var queryGetPlaneResponse = await connection.QueryAsync<Plane>(queryGetStock).ConfigureAwait(false);
+                int status = queryGetPlaneResponse.FirstOrDefault()!.Status == 0 ? 1 : 0;
+
+                string queryUpdateStatus = $"update planes set status = { status } where id = '{ queryGetPlaneResponse.FirstOrDefault()!.PlaneId }'";
+
+                return await connection.ExecuteAsync(queryUpdateStatus).ConfigureAwait(false) == 1 ? true : false;
+            }
+        }
+
+        public async Task<int> GetPlaneStatus(string authorization)
+        {
+            User user = JwtExtension.ReturnUserFromToken(authorization);
+
+            using (var connection = _context.CreateConnection())
+            {
+                string queryGetUser = $"select * from users where nif = '{user.Nif}'";
+                var users = await connection.QueryAsync<User>(queryGetUser).ConfigureAwait(false);
+
+                string queryGetStock = $"select status from planes as p inner join attendants as a on a.plane_id = p.id where user_id = { users.FirstOrDefault()!.Id }";
+
+                var queryGetPlaneResponse = await connection.QueryAsync<Plane>(queryGetStock).ConfigureAwait(false);
+                return queryGetPlaneResponse.FirstOrDefault()!.Status;
+            }
+        }
+
         public async Task<GetPlaneStockResponse> GetPlaneStock(string authorization)
         {
             User user = JwtExtension.ReturnUserFromToken(authorization);

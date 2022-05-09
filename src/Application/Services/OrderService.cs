@@ -117,7 +117,7 @@ namespace JumboTravel.Api.src.Application.Services
 
                 int planeStatus = getPlaneStatusResponse.ToList()[0].Status;
 
-                if (planeStatus == 1)
+                if (planeStatus == 0)
                 {
                     return false;
                 }
