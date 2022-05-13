@@ -183,5 +183,23 @@ namespace JumboTravel.Api.src.Controllers
                 throw;
             }
         }
+
+        [HttpGet("GetOrdersRegistry")]
+        [ProducesResponseType(typeof(List<Order>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<IActionResult> GetOrdersRegistry([FromHeader] string authorization)
+        {
+            try
+            {
+                var result = await _orderService.GetOrdersRegistry(authorization).ConfigureAwait(false);
+
+                return result.Count < 1 ? NoContent() : Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetOrderLinesByOrderId, in OrderController");
+                throw;
+            }
+        }
     }
 }

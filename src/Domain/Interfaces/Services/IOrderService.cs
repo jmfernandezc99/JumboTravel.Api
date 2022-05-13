@@ -13,6 +13,7 @@ namespace JumboTravel.Api.src.Domain.Interfaces.Services
         Task<ObtainInvoiceResponse?> ObtainInvoice(ObtainInvoiceRequest rq, string authorization);
         Task<List<Order>> GetOrdersByBase(string location, string authorization);
         Task<List<Order>> GetAllOrdersByBase(string location, string authorization);
+        Task<List<GetAllOrdersRegistryResponse>> GetOrdersRegistry(string authorization);
         Task<bool> CanCreateOrder(string authorization);
         Task<List<GetOrderLinesResponse>> GetOrderLinesByOrderId(string orderId, string authorization);
     }

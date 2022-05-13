@@ -28,14 +28,14 @@ namespace JumboTravel.Api.src.Application.Extensions
 
         public static User ReturnUserFromToken(string token)
         {
-            var tokenConverted = new JwtSecurityToken(token.Replace("Bearer ", ""));
+            var tokenConverted = new JwtSecurityToken(token.Replace("Bearer ", string.Empty));
 
             return new User()
             {
-                Nif = tokenConverted.Claims.FirstOrDefault()!.ToString().Replace("unique_name: ", "")
+                Nif = tokenConverted.Claims.FirstOrDefault()!.ToString().Replace("unique_name: ", string.Empty)
             };
         }
 
-        public static bool ValidateToken(string token) => DateTime.Now < new JwtSecurityToken(token.Replace("Bearer ", "")).ValidTo;
+        public static bool ValidateToken(string token) => DateTime.Now < new JwtSecurityToken(token.Replace("Bearer ", string.Empty)).ValidTo;
     }
 }
