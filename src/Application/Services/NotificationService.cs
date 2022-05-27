@@ -10,7 +10,6 @@ namespace JumboTravel.Api.src.Application.Services
     public class NotificationService : INotificationService
     {
         private readonly DapperContext _context;
-
         public NotificationService(DapperContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
@@ -19,16 +18,14 @@ namespace JumboTravel.Api.src.Application.Services
         {
             User user = JwtExtension.ReturnUserFromToken(token);
 
-            using (var connection = _context.CreateConnection())
-            {
-                string queryGetUser = $"select * from users where nif = '{user.Nif}'";
-                var users = await connection.QueryAsync<User>(queryGetUser).ConfigureAwait(false);
+            using var connection = _context.CreateConnection();
+            string queryGetUser = $"select * from users where nif = '{user.Nif}'";
+            var users = await connection.QueryAsync<User>(queryGetUser).ConfigureAwait(false);
 
-                string queryGetNotifications = $"SELECT id, title, user_id as UserId, description from notifications where user_id = {users.FirstOrDefault()!.Id}";
+            string queryGetNotifications = $"SELECT id, title, user_id as UserId, description from notifications where user_id = {users.FirstOrDefault()!.Id}";
 
-                var getNotificationsResponse = await connection.QueryAsync<Notification>(queryGetNotifications).ConfigureAwait(false);
-                return getNotificationsResponse.Count() > 0 ? getNotificationsResponse.Reverse().ToList() : new List<Notification>();
-            }
+            var getNotificationsResponse = await connection.QueryAsync<Notification>(queryGetNotifications).ConfigureAwait(false);
+            return getNotificationsResponse.Count() > 0 ? getNotificationsResponse.Reverse().ToList() : new List<Notification>();
         }
     }
 }

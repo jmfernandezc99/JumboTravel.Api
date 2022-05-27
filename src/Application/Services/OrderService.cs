@@ -145,7 +145,7 @@ namespace JumboTravel.Api.src.Application.Services
             string queryGetUser = $"select * from users where nif = '{user.Nif}'";
             var users = await connection.QueryAsync<User>(queryGetUser).ConfigureAwait(false);
 
-            if (users.ToList().Count() < 1)
+            if (users.ToList().Count < 1)
             {
                 return new List<Order>();
             }

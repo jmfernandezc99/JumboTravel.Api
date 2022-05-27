@@ -18,7 +18,7 @@ namespace JumboTravel.Api.src.Application.Extensions
                 {
                     new Claim(ClaimTypes.Name, data!)
                 }),
-                Expires = DateTime.Now.AddDays(1),
+                Expires = DateTime.Now.AddHours(2).AddMinutes(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(tokenKey), SecurityAlgorithms.HmacSha256Signature),
             };
 
